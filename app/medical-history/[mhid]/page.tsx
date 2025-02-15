@@ -21,7 +21,7 @@ export default async function RecordDetailPage({
 }: {
   params: { mhid: string };
 }) {
-  const { mhid } = await params;
+  const { mhid } = params;
   const record = getMedicalRecord(mhid);
 
   return (
