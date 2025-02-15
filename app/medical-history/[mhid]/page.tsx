@@ -16,12 +16,12 @@ const getMedicalRecord = (id: string) => {
   };
 };
 
-export default async function RecordDetailPage({
+export default async function Page({
   params,
 }: {
-  params: { mhid: string };
+  params: Promise<{ mhid: string }>;
 }) {
-  const { mhid } = params;
+  const mhid = (await params).mhid;
   const record = getMedicalRecord(mhid);
 
   return (
