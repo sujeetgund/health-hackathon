@@ -1,6 +1,14 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
+
+// Function to convert a file to a URL
+export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
+
+export const handleError = (error: unknown) => {
+  console.error(error);
+  throw new Error(typeof error === "string" ? error : JSON.stringify(error));
+};

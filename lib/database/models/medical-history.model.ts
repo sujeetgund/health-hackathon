@@ -1,19 +1,21 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IMedicalHistory extends Document {
-  user: mongoose.Types.ObjectId;
+export interface IMedicalHistory extends Document {
+  user: string;
+  title: string;
   condition: string;
   treatment: string;
-  date: Date;
+  recordDate: Date;
   files?: string[];
 }
 
 const MedicalHistorySchema = new Schema<IMedicalHistory>({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  user: { type: String, required: true },
+  title: { type: String, required: true },
   condition: { type: String, required: true },
   treatment: { type: String },
-  date: { type: Date, default: Date.now },
-  files: [{ type: String, maxlength: 3 }],
+  recordDate: { type: Date, default: Date.now },
+  files: [{ type: String }],
 });
 
 export default mongoose.models.MedicalHistory ||
