@@ -74,7 +74,10 @@ export default function MedicalRecordsList({
           <CollapsibleContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
               {section.records.map((record) => (
-                <Link href={`/medical-history/${record._id}`} key={record._id}>
+                <Link
+                  href={`/medical-history/${record._id}`}
+                  key={record.title}
+                >
                   <Card className="hover:bg-accent/50 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
