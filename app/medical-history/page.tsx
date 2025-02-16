@@ -4,11 +4,17 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import MedicalRecordsList from "@/components/shared/MedicalRecordsList";
+import { getAllMedicalRecords } from "@/lib/actions/medical-history.actions";
+import { IMedicalHistory } from "@/lib/database/models/medical-history.model";
 
 const page = async () => {
   const { userId, redirectToSignIn } = await auth();
 
+  // Return to signin if no user
   if (!userId) return redirectToSignIn();
+
+  // Get medical records by userId
+  const records: IMedicalHistory[] = await getAllMedicalRecords(userId);
   return (
     <div className="wrapper">
       <div className="flex-between mb-8">
@@ -19,7 +25,7 @@ const page = async () => {
           </Button>
         </Link>
       </div>
-      <MedicalRecordsList />
+      <MedicalRecordsList records={records} />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { FileText } from "lucide-react";
 import Link from "next/link";
 import {
@@ -8,70 +9,59 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Card, CardContent } from "@/components/ui/card";
+import { IMedicalHistory } from "@/lib/database/models/medical-history.model";
 
-// Mock data - replace with actual data fetching
-const mockRecords = {
-  today: [
-    {
-      id: 1,
-      name: "Annual Checkup 2024",
-      date: new Date(),
-      type: "General",
-      doctor: "Dr. Smith",
-    },
-  ],
-  thisWeek: [
-    {
-      id: 2,
-      name: "Dental Cleaning",
-      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      type: "Dental",
-      doctor: "Dr. Johnson",
-    },
-    {
-      id: 3,
-      name: "Blood Test Results",
-      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      type: "Laboratory",
-      doctor: "Dr. Williams",
-    },
-  ],
-  lastWeek: [
-    {
-      id: 4,
-      name: "X-Ray Report",
-      date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-      type: "Radiology",
-      doctor: "Dr. Brown",
-    },
-    {
-      id: 5,
-      name: "Cardiology Consultation",
-      date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-      type: "Cardiology",
-      doctor: "Dr. Davis",
-    },
-  ],
-};
-
-type TimeSection = {
+type Section = {
   title: string;
-  records: Array<{
-    id: number;
-    name: string;
-    date: Date;
-    type: string;
-    doctor: string;
-  }>;
+  records: IMedicalHistory[];
 };
 
-const sections: TimeSection[] = [
-  { title: "Today", records: mockRecords.today },
-  { title: "Earlier this week", records: mockRecords.thisWeek },
-  { title: "Last week", records: mockRecords.lastWeek },
-];
+function groupRecordsByDate(records: IMedicalHistory[]): Section[] {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
 
-export default function MedicalRecordsList() {
+  const sections: { [key: string]: IMedicalHistory[] } = {
+    "This Month": [],
+    "Last Month": [],
+    "This Year": [],
+    "Last Year": [],
+    Older: [],
+  };
+
+  records.forEach((record) => {
+    const recordDate = new Date(record.recordDate);
+    const recordYear = recordDate.getFullYear();
+    const recordMonth = recordDate.getMonth();
+
+    if (recordYear === currentYear && recordMonth === currentMonth) {
+      sections["This Month"].push(record);
+    } else if (recordYear === currentYear && recordMonth === currentMonth - 1) {
+      sections["Last Month"].push(record);
+    } else if (recordYear === currentYear) {
+      sections["This Year"].push(record);
+    } else if (recordYear === currentYear - 1) {
+      sections["Last Year"].push(record);
+    } else {
+      sections["Older"].push(record);
+    }
+  });
+
+  return (
+    Object.entries(sections)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .filter(([_, records]) => records.length > 0)
+      .map(([title, records]) => ({ title, records }))
+  );
+}
+
+export default function MedicalRecordsList({
+  records,
+}: {
+  records: IMedicalHistory[];
+}) {
+  const sections = useMemo(() => groupRecordsByDate(records), [records]);
+
   return (
     <div className="space-y-6">
       {sections.map((section) => (
@@ -84,7 +74,7 @@ export default function MedicalRecordsList() {
           <CollapsibleContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
               {section.records.map((record) => (
-                <Link href={`/medical-history/${record.id}`} key={record.id}>
+                <Link href={`/medical-history/${record._id}`} key={record._id}>
                   <Card className="hover:bg-accent/50 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
@@ -92,12 +82,12 @@ export default function MedicalRecordsList() {
                           <FileText className="h-6 w-6 text-primary" />
                         </div>
                         <div className="space-y-1">
-                          <h3 className="p-medium-16">{record.name}</h3>
+                          <h3 className="p-medium-16">{record.title}</h3>
                           <p className="p-regular-14 text-muted-foreground">
-                            {record.type} • {record.doctor}
+                            {record.condition}
                           </p>
                           <p className="p-regular-12 text-muted-foreground">
-                            {record.date.toLocaleDateString()}
+                            {new Date(record.recordDate).toLocaleDateString()}
                           </p>
                         </div>
                       </div>

@@ -8,7 +8,7 @@ import User from "@/lib/database/models/user.model";
 
 import { handleError } from "../utils";
 
-type IRecord = {
+export type IRecord = {
   title: string;
   condition: string;
   treatment: string;
@@ -86,6 +86,19 @@ export async function getMedicalRecord(mhid: string) {
     const record = await MedicalHistory.findById(mhid);
 
     return JSON.parse(JSON.stringify(record));
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Get All Medical Records by User ID
+export async function getAllMedicalRecords(userId: string) {
+  try {
+    await connectToDatabase();
+
+    const records = await MedicalHistory.find({ user: userId });
+
+    return JSON.parse(JSON.stringify(records));
   } catch (error) {
     handleError(error);
   }
