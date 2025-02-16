@@ -1,75 +1,80 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-
-// This would be replaced with actual data fetching
-const getMedicalRecord = (id: string) => {
-  return {
-    id,
-    name: "Annual Checkup 2024",
-    type: "General",
-    doctor: "Dr. Smith",
-    date: new Date(),
-    notes:
-      "Regular checkup with blood pressure monitoring and general health assessment.",
-  };
-};
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { getMedicalRecord } from "@/lib/actions/medical-history.actions"
+import type { IMedicalHistory } from "@/lib/database/models/medical-history.model"
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ mhid: string }>;
+  params: Promise<{ mhid: string }>
 }) {
-  const mhid = (await params).mhid;
-  const record = getMedicalRecord(mhid);
+  const mhid = (await params).mhid
+  const record: IMedicalHistory = await getMedicalRecord(mhid)
 
   return (
-    <div className="wrapper">
-      <div className="mb-8">
-        <Link href="/medical-history">
-          <Button variant="ghost" className="gap-2">
-            <ArrowLeft className="h-4 w-4" /> Back to Medical History
-          </Button>
-        </Link>
-      </div>
+    <div className="container mx-auto py-8">
+      <Link href="/medical-history">
+        <Button variant="ghost" className="mb-6 flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" /> Back to Medical History
+        </Button>
+      </Link>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{record.name}</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-primary text-primary-foreground">
+          <CardTitle className="text-2xl">{record.title}</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="p-medium-16">Type</h3>
-                <p className="p-regular-14 text-muted-foreground">
-                  {record.type}
-                </p>
-              </div>
-              <div>
-                <h3 className="p-medium-16">Doctor</h3>
-                <p className="p-regular-14 text-muted-foreground">
-                  {record.doctor}
-                </p>
-              </div>
-              <div>
-                <h3 className="p-medium-16">Date</h3>
-                <p className="p-regular-14 text-muted-foreground">
-                  {record.date.toLocaleDateString()}
-                </p>
-              </div>
-            </div>
+        <CardContent className="p-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <InfoSection title="Condition" content={record.condition} />
+            <InfoSection title="Treatment" content={record.treatment} />
+            <InfoSection title="Date" content={new Date(record.recordDate).toLocaleDateString()} />
+            <InfoSection title="Notes" content={record.notes || "No notes available"} />
+          </div>
 
-            <div>
-              <h3 className="p-medium-16 mb-2">Notes</h3>
-              <p className="p-regular-14 text-muted-foreground">
-                {record.notes}
-              </p>
+          <Separator className="my-6" />
+
+          <div>
+            <h3 className="mb-4 text-lg font-semibold">Files</h3>
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {record.files?.map((file) => (
+                <FileCard key={file} file={file} />
+              ))}
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
+
+function InfoSection({ title, content }: { title: string; content: string }) {
+  return (
+    <div>
+      <h3 className="mb-2 text-sm font-medium text-muted-foreground">{title}</h3>
+      <p className="text-base">{content}</p>
+    </div>
+  )
+}
+
+function FileCard({ file }: { file: string }) {
+  return (
+    <div className="overflow-hidden rounded-lg border bg-card text-card-foreground shadow">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={file || "/placeholder.svg"} alt="Medical file" className="h-32 w-full object-cover" />
+      <div className="p-2">
+        <a
+          href={file}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          View File
+        </a>
+      </div>
+    </div>
+  )
+}
+

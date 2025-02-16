@@ -6,6 +6,7 @@ export interface IMedicalHistory extends Document {
   condition: string;
   treatment: string;
   recordDate: Date;
+  notes?: string;
   files?: string[];
 }
 
@@ -15,6 +16,7 @@ const MedicalHistorySchema = new Schema<IMedicalHistory>({
   condition: { type: String, required: true },
   treatment: { type: String },
   recordDate: { type: Date, default: Date.now },
+  notes: { type: String },
   files: [{ type: String }],
 });
 

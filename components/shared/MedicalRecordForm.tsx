@@ -1,31 +1,30 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type * as z from "zod";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  FormDescription,
   FormField,
   FormItem,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import * as z from "zod";
-import { medicalRecordFormDefaultValues } from "@/constants";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FileUploader } from "./FileUploader";
-import { useState } from "react";
-import Image from "next/image";
-import DatePicker from "react-datepicker";
 
-import "react-datepicker/dist/react-datepicker.css";
-import { useRouter } from "next/navigation";
-import { IMedicalHistory } from "@/lib/database/models/medical-history.model";
+import { medicalRecordFormDefaultValues } from "@/constants";
+import type { IMedicalHistory } from "@/lib/database/models/medical-history.model";
 import { medicalHistoryFormSchema } from "@/lib/validator";
 import { useUploadThing } from "@/lib/uploadthing";
 import {
@@ -47,16 +46,13 @@ const MedicalRecordForm = ({
   mhid,
 }: MedicalRecordFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
+  const router = useRouter();
+  const { startUpload } = useUploadThing("imageUploader");
+
   const initialValues =
     medicalRecord && type === "Update"
-      ? {
-          ...medicalRecord,
-        }
+      ? { ...medicalRecord }
       : medicalRecordFormDefaultValues;
-
-  const router = useRouter();
-
-  const { startUpload } = useUploadThing("imageUploader");
 
   const form = useForm<z.infer<typeof medicalHistoryFormSchema>>({
     resolver: zodResolver(medicalHistoryFormSchema),
@@ -68,181 +64,178 @@ const MedicalRecordForm = ({
 
     if (files.length > 0) {
       const uploadedImages = await startUpload(files);
-
       if (!uploadedImages) {
         alert("Failed to upload image");
         return;
       }
-
       uploadedImageUrl = uploadedImages[0].url;
     }
 
-    if (type === "Create") {
-      try {
+    try {
+      if (type === "Create") {
         const newRecord = await createMedicalRecord({
           record: { ...values, files: [uploadedImageUrl] },
           userId,
-          // path: "/profile",
         });
-
         if (newRecord) {
           form.reset();
           router.push(`/medical-history/${newRecord._id}`);
         }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    if (type === "Update") {
-      if (!mhid) {
-        router.back();
-        return;
-      }
-
-      try {
+      } else if (type === "Update" && mhid) {
         const modifiedRecord = await updateMedicalRecord({
           userId,
           record: { ...values, files: [uploadedImageUrl] },
           mhid,
-          // path: `/medical-history/${mhid}`,
         });
-
         if (modifiedRecord) {
           form.reset();
           router.push(`/medical-history/${modifiedRecord.mhid}`);
         }
-      } catch (error) {
-        console.log(error);
       }
+    } catch (error) {
+      console.error(error);
     }
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-5"
-      >
-        <div className="flex flex-col gap-5 md:flex-row">
-          {/* Record Title */}
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl>
-                  <Input
-                    placeholder="Record title"
-                    {...field}
-                    className="input-field"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <Card className="w-full max-w-7xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-center">
+          {type} Medical Record
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Record Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Record title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          {/* Record Date */}
-          <FormField
-            control={form.control}
-            name="recordDate"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl>
-                  <div className="flex justify-center w-full overflow-hidden rounded-full bg-grey-50 px-4">
-                    <Image
-                      src="/assets/icons/calendar.svg"
-                      alt="calendar"
-                      width={24}
-                      height={24}
-                      className="filter-grey"
+              <FormField
+                control={form.control}
+                name="recordDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Record Date</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center w-full overflow-hidden rounded-md border border-input bg-background px-3">
+                        <Image
+                          src="/assets/icons/calendar.svg"
+                          alt="calendar"
+                          width={24}
+                          height={24}
+                          className="mr-2 opacity-50"
+                        />
+                        <DatePicker
+                          selected={field.value}
+                          onChange={(date: Date | null) => field.onChange(date)}
+                          dateFormat="MM/dd/yyyy"
+                          className="w-full p-2 bg-transparent focus:outline-none"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="condition"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Condition</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Condition suffered by patient"
+                        className="h-32 resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="treatment"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Treatment</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Treatment given to patient"
+                        className="h-32 resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Additional notes"
+                        className="h-32 resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Upload Files</FormLabel>
+                  <FormControl>
+                    <FileUploader
+                      onFieldChange={field.onChange}
+                      imageUrl={field.value}
+                      setFiles={setFiles}
                     />
-                    {/* <p className="ml-3 whitespace-nowrap text-grey-600">
-                      Record Date:
-                    </p> */}
-                    <DatePicker
-                      selected={field.value}
-                      onChange={(date: Date | null) => field.onChange(date)}
-                      // showTimeSelect={true}
-                      // timeInputLabel="Time:"
-                      dateFormat="MM/dd/yyyy"
-                      wrapperClassName="datePicker"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="flex flex-col gap-5 md:flex-row">
-          {/* Condition */}
-          <FormField
-            control={form.control}
-            name="condition"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl className="h-72">
-                  <Textarea
-                    placeholder="Condition suffered by patient"
-                    {...field}
-                    className="textarea rounded-2xl"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Treatment */}
-          <FormField
-            control={form.control}
-            name="treatment"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl className="h-72">
-                  <Textarea
-                    placeholder="Treatment given to patient"
-                    {...field}
-                    className="textarea rounded-2xl"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl className="h-72">
-                  <FileUploader
-                    onFieldChange={field.onChange}
-                    imageUrl={field.value}
-                    setFiles={setFiles}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          size="lg"
-          disabled={form.formState.isSubmitting}
-          className="button col-span-2 w-full"
-        >
-          {form.formState.isSubmitting ? "Submitting..." : `${type} Record `}
-        </Button>
-      </form>
-    </Form>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Submitting..." : `${type} Record`}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 };
 

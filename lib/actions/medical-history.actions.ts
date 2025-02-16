@@ -8,19 +8,22 @@ import User from "@/lib/database/models/user.model";
 
 import { handleError } from "../utils";
 
+type IRecord = {
+  title: string;
+  condition: string;
+  treatment: string;
+  recordDate: Date;
+  notes?: string;
+  files?: string[];
+};
+
 // Create Medical Record
 export async function createMedicalRecord({
   userId,
   record,
 }: {
   userId: string;
-  record: {
-    title: string;
-    condition: string;
-    treatment: string;
-    recordDate: Date;
-    files?: string[];
-  };
+  record: IRecord;
 }) {
   try {
     await connectToDatabase();
@@ -52,13 +55,7 @@ export async function updateMedicalRecord({
 }: {
   userId: string;
   mhid: string;
-  record: {
-    title: string;
-    condition: string;
-    treatment: string;
-    recordDate: Date;
-    files?: string[];
-  };
+  record: IRecord;
 }) {
   try {
     await connectToDatabase();
@@ -76,6 +73,19 @@ export async function updateMedicalRecord({
     );
 
     return JSON.parse(JSON.stringify(updatedRecord));
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Get Medical Record  by MHID
+export async function getMedicalRecord(mhid: string) {
+  try {
+    await connectToDatabase();
+
+    const record = await MedicalHistory.findById(mhid);
+
+    return JSON.parse(JSON.stringify(record));
   } catch (error) {
     handleError(error);
   }
