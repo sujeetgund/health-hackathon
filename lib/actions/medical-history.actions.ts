@@ -1,7 +1,5 @@
 "use server";
 
-// import { revalidatePath } from "next/cache";
-
 import { connectToDatabase } from "@/lib/database";
 import MedicalHistory from "@/lib/database/models/medical-history.model";
 import User from "@/lib/database/models/user.model";
@@ -28,11 +26,11 @@ export async function createMedicalRecord({
   try {
     await connectToDatabase();
 
-    // const user = await User.findById(userId);
+    const user = await User.findById(userId);
 
-    // if (!user) {
-    //   throw new Error("User not found");
-    // }
+    if (!user) {
+      throw new Error("User not found");
+    }
 
     const newRecord = new MedicalHistory({
       user: userId,
