@@ -17,23 +17,23 @@ export type IRecord = {
 
 // Create Medical Record
 export async function createMedicalRecord({
-  userId,
+  clerkId,
   record,
 }: {
-  userId: string;
+  clerkId: string;
   record: IRecord;
 }) {
   try {
     await connectToDatabase();
 
-    const user = await User.findById(userId);
+    const user = await User.findOne({clerkId});
 
     if (!user) {
       throw new Error("User not found");
     }
 
     const newRecord = new MedicalHistory({
-      user: userId,
+      userClerkId: clerkId,
       ...record,
     });
 
@@ -47,18 +47,18 @@ export async function createMedicalRecord({
 
 // Update Medical Record
 export async function updateMedicalRecord({
-  userId,
+  clerkId,
   mhid,
   record,
 }: {
-  userId: string;
+  clerkId: string;
   mhid: string;
   record: IRecord;
 }) {
   try {
     await connectToDatabase();
 
-    const user = await User.findById(userId);
+    const user = await User.findOne({clerkId});
 
     if (!user) {
       throw new Error("User not found");
@@ -66,7 +66,7 @@ export async function updateMedicalRecord({
 
     const updatedRecord = await MedicalHistory.findByIdAndUpdate(
       mhid,
-      { ...record },
+      { ...record, userClerkId: clerkId },
       { new: true }
     );
 
@@ -90,11 +90,11 @@ export async function getMedicalRecord(mhid: string) {
 }
 
 // Get All Medical Records by User ID
-export async function getAllMedicalRecords(userId: string) {
+export async function getAllMedicalRecords(clerkId: string) {
   try {
     await connectToDatabase();
 
-    const records = await MedicalHistory.find({ user: userId });
+    const records = await MedicalHistory.find({ clerkId });
 
     return JSON.parse(JSON.stringify(records));
   } catch (error) {

@@ -33,14 +33,14 @@ import {
 } from "@/lib/actions/medical-history.actions";
 
 type MedicalRecordFormProps = {
-  userId: string;
+  clerkId: string;
   type: "Create" | "Update";
   medicalRecord?: IMedicalHistory;
   mhid?: string;
 };
 
 const MedicalRecordForm = ({
-  userId,
+  clerkId,
   type,
   medicalRecord,
   mhid,
@@ -75,7 +75,7 @@ const MedicalRecordForm = ({
       if (type === "Create") {
         const newRecord = await createMedicalRecord({
           record: { ...values, files: [uploadedImageUrl] },
-          userId,
+          clerkId,
         });
         if (newRecord) {
           form.reset();
@@ -83,7 +83,7 @@ const MedicalRecordForm = ({
         }
       } else if (type === "Update" && mhid) {
         const modifiedRecord = await updateMedicalRecord({
-          userId,
+          clerkId,
           record: { ...values, files: [uploadedImageUrl] },
           mhid,
         });

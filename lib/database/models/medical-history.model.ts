@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IMedicalHistory extends Document {
-  user: string;
+  userClerkId: string;
   title: string;
   condition: string;
   treatment: string;
@@ -11,7 +11,7 @@ export interface IMedicalHistory extends Document {
 }
 
 const MedicalHistorySchema = new Schema<IMedicalHistory>({
-  user: { type: String, required: true },
+  userClerkId: { type: String, required: true },
   title: { type: String, required: true },
   condition: { type: String, required: true },
   treatment: { type: String },
