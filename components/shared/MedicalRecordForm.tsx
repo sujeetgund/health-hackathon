@@ -60,36 +60,38 @@ const MedicalRecordForm = ({
   });
 
   async function onSubmit(values: z.infer<typeof medicalHistoryFormSchema>) {
-    let uploadedImageUrl = values.imageUrl;
+    const uploadedImagesUrl: string[] = [];
 
     if (files.length > 0) {
       const uploadedImages = await startUpload(files);
       if (!uploadedImages) {
-        alert("Failed to upload image");
+        alert("Failed to upload attachment");
         return;
       }
-      uploadedImageUrl = uploadedImages[0].url;
+      uploadedImages.forEach((image) => {
+        uploadedImagesUrl.push(image.ufsUrl);
+      });
     }
 
     try {
       if (type === "Create") {
         const newRecord = await createMedicalRecord({
-          record: { ...values, files: [uploadedImageUrl] },
+          record: { ...values, files: uploadedImagesUrl },
           clerkId,
         });
         if (newRecord) {
-          form.reset();
           router.push(`/medical-history/${newRecord._id}`);
+          form.reset();
         }
       } else if (type === "Update" && mhid) {
         const modifiedRecord = await updateMedicalRecord({
           clerkId,
-          record: { ...values, files: [uploadedImageUrl] },
+          record: { ...values, files: uploadedImagesUrl },
           mhid,
         });
         if (modifiedRecord) {
-          form.reset();
           router.push(`/medical-history/${modifiedRecord.mhid}`);
+          form.reset();
         }
       }
     } catch (error) {
@@ -129,19 +131,19 @@ const MedicalRecordForm = ({
                   <FormItem>
                     <FormLabel>Record Date</FormLabel>
                     <FormControl>
-                      <div className="flex items-center w-full overflow-hidden rounded-md border border-input bg-background px-3">
+                      <div className="flex items-center w-full overflow-hidden rounded-md border border-input px-3">
                         <Image
                           src="/assets/icons/calendar.svg"
                           alt="calendar"
                           width={24}
                           height={24}
-                          className="mr-2 opacity-50"
+                          className="mr-2 opacity-80"
                         />
                         <DatePicker
                           selected={field.value}
                           onChange={(date: Date | null) => field.onChange(date)}
-                          dateFormat="MM/dd/yyyy"
-                          className="w-full p-2 bg-transparent focus:outline-none"
+                          dateFormat="dd/MM/yyyy"
+                          className="w-full py-[4px] bg-transparent focus:outline-none"
                         />
                       </div>
                     </FormControl>
@@ -193,7 +195,7 @@ const MedicalRecordForm = ({
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormLabel>Notes (Optional)</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Additional notes"
@@ -212,7 +214,7 @@ const MedicalRecordForm = ({
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Upload Files</FormLabel>
+                  <FormLabel>Upload Files (Optional and max upto 3 files)</FormLabel>
                   <FormControl>
                     <FileUploader
                       onFieldChange={field.onChange}

@@ -32,7 +32,7 @@ export default async function Page({
             <InfoSection title="Treatment" content={record.treatment} />
             <InfoSection
               title="Date"
-              content={new Date(record.recordDate).toLocaleDateString()}
+              content={new Date(record.recordDate).toLocaleDateString("en-IN")}
             />
             <InfoSection
               title="Notes"
@@ -77,7 +77,8 @@ function FileCard({ file }: { file: string }) {
       <img
         src={file || "/assets/icons/spinner.svg"}
         alt="Medical file"
-        className="h-32 w-full object-cover"
+        className="h-32 w-full object-contain"
+        loading="lazy"
       />
       <div className="p-2">
         <a

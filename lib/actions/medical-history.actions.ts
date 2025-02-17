@@ -38,6 +38,9 @@ export async function createMedicalRecord({
     });
 
     await newRecord.save();
+    
+    user.medicalHistory.push(newRecord._id);
+    await user.save();
 
     return JSON.parse(JSON.stringify(newRecord));
   } catch (error) {

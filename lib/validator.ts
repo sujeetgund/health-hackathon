@@ -12,5 +12,8 @@ export const medicalHistoryFormSchema = z.object({
     .max(1000, "Treatment must be less than 400 characters"),
   imageUrl: z.string(),
   recordDate: z.date(),
-  notes: z.string().max(500, "Notes must be less than 500 characters"),
+  notes: z
+    .string()
+    .max(500, "Notes must be less than 500 characters")
+    .optional(),
 });
