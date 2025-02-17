@@ -26,7 +26,7 @@ export async function createMedicalRecord({
   try {
     await connectToDatabase();
 
-    const user = await User.findOne({clerkId});
+    const user = await User.findOne({ clerkId });
 
     if (!user) {
       throw new Error("User not found");
@@ -58,7 +58,7 @@ export async function updateMedicalRecord({
   try {
     await connectToDatabase();
 
-    const user = await User.findOne({clerkId});
+    const user = await User.findOne({ clerkId });
 
     if (!user) {
       throw new Error("User not found");
@@ -94,7 +94,8 @@ export async function getAllMedicalRecords(clerkId: string) {
   try {
     await connectToDatabase();
 
-    const records = await MedicalHistory.find({ clerkId });
+    const records = await MedicalHistory.find({ userClerkId: clerkId });
+    // console.log(records);
 
     return JSON.parse(JSON.stringify(records));
   } catch (error) {
