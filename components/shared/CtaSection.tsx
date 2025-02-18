@@ -12,7 +12,7 @@ const CtaSection = () => {
         <p className="text-xl mb-8">
           Join thousands of users who trust us with their medical history.
         </p>
-        <Button asChild size="lg">
+        <Button asChild size="lg" className="rounded-full">
           <Link href="/medical-history/create">Add Your Records</Link>
         </Button>
       </div>

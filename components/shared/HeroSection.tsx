@@ -24,7 +24,7 @@ const HeroSection = async () => {
           </Button>
         </SignedOut>
         <SignedIn>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-4 sm:gap-8 mt-8 flex-col md:flex-row">
             <Button
               asChild
               size="lg"
