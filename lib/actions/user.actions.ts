@@ -64,3 +64,56 @@ export async function updateUser({
     handleError(error);
   }
 }
+
+// Add or Update Health Overview in User in MongoDB
+export async function addOrUpdateHealthOverview(
+  clerkId: string,
+  healthOverview: {
+    bloodPressure: string;
+    heartRate: string;
+    sugarLevel: string;
+    medicationAdherence: string;
+  }
+) {
+  try {
+    await connectToDatabase();
+
+    // console.log(healthOverview);
+
+    const modifiedUser = await User.findOneAndUpdate(
+      { clerkId },
+      { healthOverview },
+      { new: true }
+    );
+    if (!modifiedUser) {
+      console.log("Health Overview update failed");
+      throw new Error("Health Overview update failed");
+    }
+    // console.log(modifiedUser)
+    return JSON.parse(JSON.stringify(modifiedUser));
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Get Health Overview in User in MongoDB
+export async function getHealthOverview(clerkId: string) {
+  try {
+    await connectToDatabase();
+
+    const user = await User.findOne({ clerkId });
+    if (!user) throw new Error("User not found");
+
+    if (!user.healthOverview)
+      return {
+        bloodPressure: "",
+        heartRate: "",
+        sugarLevel: "",
+        medicationAdherence: "",
+      };
+
+    return JSON.parse(JSON.stringify(user?.healthOverview));
+  } catch (error) {
+    handleError(error);
+  }
+}

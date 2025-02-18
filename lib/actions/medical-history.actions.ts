@@ -38,7 +38,7 @@ export async function createMedicalRecord({
     });
 
     await newRecord.save();
-    
+
     user.medicalHistory.push(newRecord._id);
     await user.save();
 
@@ -99,6 +99,21 @@ export async function getAllMedicalRecords(clerkId: string) {
 
     const records = await MedicalHistory.find({ userClerkId: clerkId });
     // console.log(records);
+
+    return JSON.parse(JSON.stringify(records));
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Get Recent Medical Records by User Clerk Id
+export async function getRecentMedicalRecords(clerkId: string) {
+  try {
+    await connectToDatabase();
+
+    const records = await MedicalHistory.find({ userClerkId: clerkId })
+      .sort({ recordDate: -1 })
+      .limit(5);
 
     return JSON.parse(JSON.stringify(records));
   } catch (error) {

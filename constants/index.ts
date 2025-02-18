@@ -8,15 +8,15 @@ export const headerLinks = [
     route: "/medical-history",
   },
   {
-    label: "Notifications",
-    route: "/notifications",
+    label: "Dashboard",
+    route: "/dashboard",
   },
 ];
 
 export const medicalRecordFormDefaultValues = {
-  title: '',
-  condition: '',
-  treatment: '',
-  imageUrl: '',
+  title: "",
+  condition: "",
+  treatment: "",
+  imageUrl: "",
   recordDateTime: new Date(),
-}
+};
