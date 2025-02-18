@@ -13,7 +13,7 @@ const CtaSection = () => {
           Join thousands of users who trust us with their medical history.
         </p>
         <Button asChild size="lg">
-          <Link href="/sign-up">Create Your Account</Link>
+          <Link href="/medical-history/create">Add Your Records</Link>
         </Button>
       </div>
     </section>
