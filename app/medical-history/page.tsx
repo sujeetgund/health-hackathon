@@ -1,4 +1,5 @@
 import React from "react";
+import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,9 @@ const page = async () => {
           </Button>
         </Link>
       </div>
-      <MedicalRecordsList records={records} />
+      <Suspense fallback={<div>Loading Records...</div>}>
+        <MedicalRecordsList records={records} />
+      </Suspense>
     </div>
   );
 };

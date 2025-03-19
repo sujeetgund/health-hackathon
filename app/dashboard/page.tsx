@@ -5,6 +5,7 @@ import QuickActionCardSection from "@/components/shared/QuickActionCard";
 import RecentMedicalRecords from "@/components/shared/RecentMedicalRecords";
 import { getHealthOverview } from "@/lib/actions/user.actions";
 import HealthOverviewCard from "@/components/shared/HealthOverviewCard";
+import { Suspense } from "react";
 
 type IHealthOverview = {
   bloodPressure?: string;
@@ -22,7 +23,7 @@ export default async function Dashboard() {
   );
 
   const healthOverview: IHealthOverview = await getHealthOverview(userId);
-//   console.log(healthOverview);
+  //   console.log(healthOverview);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -32,10 +33,17 @@ export default async function Dashboard() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {/* Recent Medical Records Card */}
-          <RecentMedicalRecords recentRecords={recentRecords} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <RecentMedicalRecords recentRecords={recentRecords} />
+          </Suspense>
 
           {/* Health Overview Card */}
-          <HealthOverviewCard healthOverview={healthOverview} clerkId={userId} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <HealthOverviewCard
+              healthOverview={healthOverview}
+              clerkId={userId}
+            />
+          </Suspense>
         </div>
       </main>
     </div>

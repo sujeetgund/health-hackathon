@@ -87,7 +87,9 @@ export default function MedicalRecordsList({
                         <div className="space-y-1">
                           <h3 className="p-medium-16">{record.title}</h3>
                           <p className="p-regular-14 text-muted-foreground">
-                            {record.condition}
+                            {record.condition.trim().length < 30
+                              ? record.condition.trim()
+                              : record.condition.trim().slice(0, 30) + "..."}
                           </p>
                           <p className="p-regular-12 text-muted-foreground">
                             {new Date(record.recordDate).toLocaleDateString()}

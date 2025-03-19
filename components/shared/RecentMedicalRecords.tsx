@@ -26,7 +26,9 @@ const RecentMedicalRecords = ({
                 <p className="font-medium">{record.title}</p>
                 <p className="text-sm text-muted-foreground">
                   {new Date(record.recordDate).toLocaleDateString("en-In")} -{" "}
-                  {record.condition}
+                  {record.condition.trim().length < 30
+                    ? record.condition.trim()
+                    : record.condition.trim().slice(0, 30) + "..."}
                 </p>
               </div>
               <Button variant="ghost" size="sm" asChild>

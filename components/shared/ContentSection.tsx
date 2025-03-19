@@ -1,6 +1,4 @@
 import React from "react";
-// import { Button } from "../ui/button";
-// import Link from "next/link";
 
 const ContentSection = () => {
   return (
@@ -21,9 +19,6 @@ const ContentSection = () => {
               doctor&apos;s visit, or just keeping track of your health journey,
               we&apos;ve got you covered.
             </p>
-            {/* <Button asChild variant="outline">
-              <Link href="/about">Learn More About Us</Link>
-            </Button> */}
           </div>
           <div className="md:w-1/2">
             <img
