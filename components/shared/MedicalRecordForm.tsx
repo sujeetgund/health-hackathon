@@ -99,10 +99,6 @@ const MedicalRecordForm = ({
     }
   }
 
-  function addDays(arg0: Date, arg1: number): Date | undefined {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <Card className="w-full max-w-7xl mx-auto">
       <CardHeader>
