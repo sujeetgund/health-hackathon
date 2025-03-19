@@ -99,6 +99,10 @@ const MedicalRecordForm = ({
     }
   }
 
+  function addDays(arg0: Date, arg1: number): Date | undefined {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <Card className="w-full max-w-7xl mx-auto">
       <CardHeader>
@@ -142,8 +146,9 @@ const MedicalRecordForm = ({
                         <DatePicker
                           selected={field.value}
                           onChange={(date: Date | null) => field.onChange(date)}
+                          maxDate={new Date()}
                           dateFormat="dd/MM/yyyy"
-                          className="w-full py-[4px] bg-transparent focus:outline-none"
+                          className="w-full h-full py-[5px]"
                         />
                       </div>
                     </FormControl>
@@ -214,7 +219,9 @@ const MedicalRecordForm = ({
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Upload Files (Optional and max upto 3 files)</FormLabel>
+                  <FormLabel>
+                    Upload Files (Optional and max upto 3 files)
+                  </FormLabel>
                   <FormControl>
                     <FileUploader
                       onFieldChange={field.onChange}

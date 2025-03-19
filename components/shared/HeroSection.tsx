@@ -8,7 +8,7 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 const HeroSection = async () => {
   // const { userId } = await auth();
   return (
-    <section className="bg-dotted-pattern bg-contain bg-primary-50 py-20">
+    <section className="bg-dotted-pattern bg-contain py-20">
       <div className="container mx-auto text-center">
         <h1 className="text-4xl md:text-6xl font-bold mb-6">
           Your Medical History, Simplified
